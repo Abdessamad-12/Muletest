@@ -1,0 +1,9 @@
+target/
+.mule/
+.studio/
+.settings/
+.project
+.classpath
+*.log
+*.jar
+src/main/resources/*-local.yaml
