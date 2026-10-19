@@ -1,0 +1,42 @@
+name: Mule CI
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>${{ secrets.ANYPOINT_USER }}</username>
+                <password>${{ secrets.ANYPOINT_PASSWORD }}</password>
+              </server>
+              <server>
+                <id>mulesoft-releases-ee</id>
+                <username>${{ secrets.MULE_REPO_USER }}</username>
+                <password>${{ secrets.MULE_REPO_PASSWORD }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Build and MUnit tests
+        run: mvn -B clean verify
